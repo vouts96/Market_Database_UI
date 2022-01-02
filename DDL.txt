@@ -1,0 +1,191 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- begin attached script 'script'
+use vaseis2020;
+
+INSERT INTO transaction_contains_products(products_Barcode)
+SELECT Barcode FROM products
+ORDER BY RAND ( )  
+LIMIT 1;  
+-- end attached script 'script'
+-- -----------------------------------------------------
+-- Schema vaseis2020
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema vaseis2020
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `vaseis2020` DEFAULT CHARACTER SET utf8 ;
+USE `vaseis2020` ;
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`category`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`category` (
+  `Category_id` INT NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Category_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`customer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`customer` (
+  `Card` VARCHAR(45) NOT NULL,
+  `Phone` VARCHAR(45) NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  `Date_of_birth` DATE NOT NULL,
+  `Age` INT NOT NULL DEFAULT timestampdiff(YEAR,`Date_of_birth`,curdate()),
+  `Address` VARCHAR(45) NOT NULL,
+  `City` VARCHAR(45) NULL DEFAULT NULL,
+  `Postal_code` VARCHAR(45) NULL DEFAULT NULL,
+  `Family_members` INT NULL DEFAULT NULL,
+  `Pet` INT NULL DEFAULT NULL,
+  `Points` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`Card`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`products` (
+  `Barcode` VARCHAR(45) NOT NULL,
+  `Price` FLOAT NOT NULL,
+  `Name` VARCHAR(45) NOT NULL,
+  `Brand_name` VARCHAR(45) NULL DEFAULT NULL,
+  `First_Transaction` VARCHAR(45) NULL DEFAULT NULL,
+  `Category_Category_id` INT NOT NULL,
+  PRIMARY KEY (`Barcode`),
+  INDEX `fk_Products_Category1_idx` (`Category_Category_id` ASC) INVISIBLE,
+  CONSTRAINT `fk_Products_Category1`
+    FOREIGN KEY (`Category_Category_id`)
+    REFERENCES `vaseis2020`.`category` (`Category_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`older_prices`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`older_prices` (
+  `Start_date` DATE NOT NULL,
+  `End_date` DATE NULL DEFAULT NULL,
+  `Price` FLOAT NOT NULL,
+  `Products_Barcode` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`Start_date`, `Products_Barcode`),
+  INDEX `fk_Older Prices_Products1_idx` (`Products_Barcode` ASC) VISIBLE,
+  CONSTRAINT `fk_Older Prices_Products1`
+    FOREIGN KEY (`Products_Barcode`)
+    REFERENCES `vaseis2020`.`products` (`Barcode`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`stores`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`stores` (
+  `Store_id` VARCHAR(45) NOT NULL,
+  `Phone` VARCHAR(45) NOT NULL,
+  `Operating_hours` LONGTEXT NOT NULL,
+  `Size` VARCHAR(45) NOT NULL,
+  `City` VARCHAR(45) NOT NULL,
+  `Address` VARCHAR(45) NULL DEFAULT NULL,
+  `Postal_code` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`Store_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`stores_offer_products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`stores_offer_products` (
+  `Stores_Store_id` VARCHAR(45) NULL DEFAULT NULL,
+  `Products_Barcode` VARCHAR(45) NULL DEFAULT NULL,
+  `Alley` VARCHAR(45) NOT NULL,
+  `Shelf` VARCHAR(45) NOT NULL,
+  INDEX `fk_Stores_has_Products_Products1_idx` (`Products_Barcode` ASC) VISIBLE,
+  INDEX `fk_Stores_has_Products_Stores1_idx` (`Stores_Store_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Stores_has_Products_Products1`
+    FOREIGN KEY (`Products_Barcode`)
+    REFERENCES `vaseis2020`.`products` (`Barcode`),
+  CONSTRAINT `fk_Stores_has_Products_Stores1`
+    FOREIGN KEY (`Stores_Store_id`)
+    REFERENCES `vaseis2020`.`stores` (`Store_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`stores_provide_categories`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`stores_provide_categories` (
+  `Stores_Store_id` VARCHAR(45) NULL DEFAULT NULL,
+  `Category_Category_id` INT NULL DEFAULT NULL,
+  INDEX `fk_Stores_has_Category_Category1_idx` (`Category_Category_id` ASC) VISIBLE,
+  INDEX `fk_Stores_has_Category_Stores1_idx` (`Stores_Store_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Stores_has_Category_Category1`
+    FOREIGN KEY (`Category_Category_id`)
+    REFERENCES `vaseis2020`.`category` (`Category_id`),
+  CONSTRAINT `fk_Stores_has_Category_Stores1`
+    FOREIGN KEY (`Stores_Store_id`)
+    REFERENCES `vaseis2020`.`stores` (`Store_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`transaction`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`transaction` (
+  `DateTime` DATETIME NOT NULL,
+  `Payment_method` VARCHAR(45) NOT NULL,
+  `Total_amount` FLOAT NULL DEFAULT NULL,
+  `customer_Card` VARCHAR(45) NOT NULL,
+  `stores_Store_id` VARCHAR(45) NULL DEFAULT NULL,
+  PRIMARY KEY (`DateTime`, `customer_Card`),
+  INDEX `fk_transaction_customer1_idx` (`customer_Card` ASC) VISIBLE,
+  INDEX `fk_transaction_stores1_idx` (`stores_Store_id` ASC) VISIBLE,
+  CONSTRAINT `fk_transaction_customer1`
+    FOREIGN KEY (`customer_Card`)
+    REFERENCES `vaseis2020`.`customer` (`Card`),
+  CONSTRAINT `fk_transaction_stores1`
+    FOREIGN KEY (`stores_Store_id`)
+    REFERENCES `vaseis2020`.`stores` (`Store_id`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+-- -----------------------------------------------------
+-- Table `vaseis2020`.`transaction_contains_products`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `vaseis2020`.`transaction_contains_products` (
+  `transaction_DateTime` DATETIME NOT NULL,
+  `transaction_customer_Card` VARCHAR(45) NOT NULL,
+  `products_Barcode` VARCHAR(45) NOT NULL,
+  `pieces` INT NULL DEFAULT NULL,
+  PRIMARY KEY (`transaction_DateTime`, `transaction_customer_Card`, `products_Barcode`),
+  INDEX `fk_transaction_has_products_products1_idx` (`products_Barcode` ASC) VISIBLE,
+  INDEX `fk_transaction_has_products_transaction1_idx` (`transaction_DateTime` ASC, `transaction_customer_Card` ASC) VISIBLE,
+  CONSTRAINT `fk_transaction_has_products_products1`
+    FOREIGN KEY (`products_Barcode`)
+    REFERENCES `vaseis2020`.`products` (`Barcode`),
+  CONSTRAINT `fk_transaction_has_products_transaction1`
+    FOREIGN KEY (`transaction_DateTime` , `transaction_customer_Card`)
+    REFERENCES `vaseis2020`.`transaction` (`DateTime` , `customer_Card`))
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;

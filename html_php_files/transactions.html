@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vaseis2020</title>
+</head>
+<body>
+
+
+
+<style>
+
+body{
+	background-color:CadetBlue;
+	height: 100%;
+
+}
+
+table {
+  border-collapse: collapse;
+  width:100%;
+  
+}
+
+p{
+  background-color: tomato;
+  border: 1px solid black;
+  width:300px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+  display:inline-block;
+  margin:0px;
+
+}
+
+parr{
+  background-color: tomato;
+  border: 1px solid black;
+  width:20px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+  display:inline-block;
+  margin:0px;
+
+}
+
+td{
+  background-color: tomato;
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+}
+
+ph{
+  background-color: rgba(255, 99, 71, 0.6);
+  border: 1px solid black;
+  width:300px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+  display:inline-block;
+  margin:0px;
+}
+
+input[type=submit]{
+  font-size: 30px;
+  font-family:serif;
+  text-align:left;
+  background-color: tomato;
+  color: white;
+  padding: 1px 28px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+a:link, a:visited {
+	background-color: tomato;
+	color: white;
+	padding: 15px 25px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+a:hover, a:active {
+  background-color: rgba(255, 99, 71, 0.82);
+}
+
+h2{
+	background-color: tomato;
+	color: white;
+	width: 500px;
+	padding: 15px 25px;
+	font-size:30px;	
+	text-decoration: none;
+	display: inline-block;
+	
+	}
+	
+h3{
+	background-color: inherit;
+	color: white;
+	width: 500px;
+	padding: 15px 25px;
+	font-size:30px;	
+	text-decoration: none;
+	display: inline-block;
+	text-align:center;
+	margin-left:27px;
+	border-bottom:1px solid white;
+	}
+	
+div {
+    text-align: center;
+}
+
+.tab button {
+  color:white;
+  background-color: inherit;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+  font-size: 17px;
+  width:auto;
+  margin:10px;
+  margin-left:27px;
+}
+
+.tab button:hover {
+  background-color: rgba(255,99,71,0.82);
+}
+
+.tab button.active {
+  background-color: tomato;
+
+}
+
+.tabcontent {
+  color:white;
+  display: none;
+ 
+}
+
+
+section {
+  float:left;
+  width:30%;
+  display: table;
+  clear: both;
+  border-right:1px solid white;
+}
+
+article:after {
+
+}
+
+div.a {
+  font-size: 30px;
+  text-align:left;
+  display:inline-block;
+  background-color:tomato;
+  padding:1px 28px;
+  
+}
+
+div.arr {
+  font-size: 30px;
+  text-align:left;
+  display:inline-block;
+  background-color:tomato;
+  padding:1px 1px;
+  
+}
+
+div.range {
+  font-size: 30px;
+  text-align:center;
+  display:inline-block;
+  width:auto;
+  padding:0px 0px;
+}
+
+.collapsible {
+
+  background-color: inherit;
+  color: white;
+  cursor: pointer;
+  padding: 0px;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: inherit;
+}
+
+
+.arrow {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+}
+
+.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+
+</style>
+
+<?php
+
+
+$servername = "localhost";
+$username = "root";
+$password = "admin";
+$dbname = "vaseis2020";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT *FROM stores ORDER BY City";
+$result = $conn->query($sql);
+
+?>
+
+<h1 style="text-align:center;font-size:50px">
+	<a href="main_page.html"> <img src="cart.png" alt="Shopping Cart" width="60" height="60">  Market Database UI</a>
+</h1>
+
+
+
+
+<div>
+<h2 style="width:1800px"> Transactions </h2>	
+</div>
+
+
+
+<article>
+<h3 style="width:1800px;margin-top:0px;margin-left:20px;">
+<form action="" method="post">
+	<input type="submit" name="submit" value="Filters:">
+	&nbsp;&nbsp;&nbsp;
+	<label for="stores">Store:</label>
+	<select name="stores" id="stores">
+		<option value="stores_Store_id" selected>All Stores</option>
+		<?php
+			$sql = "SELECT *FROM stores ORDER BY City"; $result = $conn->query($sql);
+			while($row = $result->fetch_assoc()){
+				$store_id = $row['Store_id'];
+				echo '<option value=" '.$store_id.' ">' . $row['Store_id']. " | ". $row['Phone']. " | ". $row['City']. '</option>';
+			}
+		?>
+	</select>
+	&nbsp;&nbsp;&nbsp;
+	<label for="trans_date">Date:</label>
+	<input type="date" name="trans_date" id="trans_date" value='<?php echo date('Y-m-d');?>'>
+	&nbsp;&nbsp;&nbsp;
+	
+	<label for="total">Total amount:</label>
+	<?php
+			$sql1 = "SELECT min(Total_amount) FROM transaction"; $result1 = $conn->query($sql1);
+			$rowmin = $result1->fetch_assoc();
+			$sql2 = "SELECT max(Total_amount) FROM transaction"; $result2 = $conn->query($sql2);
+			$rowmax = $result2->fetch_assoc();
+		?>
+	<div class="range">
+	<span id="total" style="color:white;font-weight:bold;font-size:20px;width:73px"></span><br>
+	<input type="range" id="total" name="total" min="<?php echo $rowmin['min(Total_amount)'];?>" max="<?php echo $rowmax['max(Total_amount)'];?>"  step="0.01"  value="<?php echo $rowmax['max(Total_amount)'];?>" onchange="show_value(this.value)">
+	</div>
+	
+	&nbsp;&nbsp;&nbsp;
+	<label for="payment" selected>Payment method:</label>
+	<select name="payment" id="payment">
+		<option value="Payment_method">All methods</option>
+		<option value="'Credit Card'">Credit Card</option>
+		<option value="'Cash'">Cash</option>
+	</select>
+	
+	&nbsp;&nbsp;&nbsp;
+	<label for="category">Category:</label>
+	<select name="category" id="category">
+		<option value="allcat" selected>All Categories</option>
+		<?php
+			$sqlcat = "SELECT *FROM category"; $resultcat = $conn->query($sqlcat);
+			while($rowcat = $resultcat->fetch_assoc()){
+				echo "<option value=\"category\">" . $rowcat['Name']. "</option>";
+			}
+		?>
+	</select><br>
+	
+</form>
+</h3>
+
+
+<?php 
+	if(isset($_POST['submit'])){
+	
+?>
+		<ph style="margin-left:27px">Store id</ph><ph>Datetime</ph><ph>Total amount</ph><ph>Customer card</ph><ph>Payment method</ph>
+
+<?php
+		$store_id = $_POST['stores'];
+		$datetime =	$_POST['trans_date'];
+		$total_amount = $_POST['total'];
+		$payment = $_POST['payment'];
+		$sqlStore = "SELECT *FROM Transaction WHERE (stores_Store_id = $store_id) AND (DATE(DateTime) <= '$datetime') AND (Total_amount <= $total_amount) AND (Payment_method = $payment)";
+		$resultStore = $conn->query($sqlStore);
+		
+		
+		while($row = $resultStore->fetch_assoc()){
+				
+				
+							
+?>
+		<button type="button" class="collapsible" style="margin-left:27px">
+		<p><?php echo  $row['stores_Store_id'];?></p><p><?php echo  $row['DateTime'];?></p><p><?php echo  $row['Total_amount'];?> &euro;</p><p><?php echo  $row['customer_Card'];?></p><p><?php echo  $row['Payment_method'];?></p><parr><i class="arrow down"></i></parr>
+		</button>
+		<div class="content"><ph style="margin-left:279px">Barcode</ph><ph>Price</ph><ph>Pieces</ph><ph>Category</ph>
+		
+<?php			
+			$datetimeInfo = $row['DateTime'];
+			//echo $datetimeInfo;
+			$sqlInfo = "SELECT Barcode,Price,Pieces,category_Category_id 
+						FROM products,transaction_contains_products 
+						WHERE (transaction_contains_products.transaction_DateTime = '$datetimeInfo') AND (transaction_contains_products.products_Barcode = products.Barcode)";
+						
+			$resultInfo = $conn->query($sqlInfo);
+			while($rowInfo = $resultInfo->fetch_assoc()){
+			
+				$category = $rowInfo['category_Category_id'];
+				$sqlCat = "SELECT Name FROM category WHERE Category_id = $category";
+				$resultCat = $conn->query($sqlCat);
+				$rowCat = $resultCat->fetch_assoc();
+?>			
+			
+			
+			<p style="margin-left:279px"><?php echo  $rowInfo['Barcode'];?></p><p><?php echo  $rowInfo['Price'];?> &euro;</p><p><?php echo  $rowInfo['Pieces'];?></p><p><?php echo  $rowCat['Name'];?></p>
+			
+			
+
+<?php			
+			}		
+			
+?>
+
+			<br><br>
+			</div>
+			
+<?php
+		}
+	}
+?>
+
+
+
+</article>
+
+
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+
+
+function show_value(x)
+{
+ document.getElementById("total").innerHTML=x;
+}
+</script>
+
+
+
+</body>
+</html>

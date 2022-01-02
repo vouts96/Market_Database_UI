@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vaseis2020</title>
+</head>
+<body>
+
+
+
+<style>
+
+
+body{
+	background-color:CadetBlue;
+	height: 100%;
+	
+}
+
+table {
+  border-collapse: collapse;
+  
+  margin-left:4%;
+}
+
+td{
+  background-color: tomato;
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:left;
+}
+
+td.Stores{
+  background-color: tomato;
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+}
+
+
+th{
+  background-color: rgba(255, 99, 71, 0.6);
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+}
+
+a:link, a:visited {
+	background-color: tomato;
+	color: white;
+	padding: 15px 25px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+section {
+  float:left;
+  width:25%;
+  display: block;
+  clear: both;
+  margin-left:20%;
+  margin-right:4%;
+}
+
+article:after{
+	float:left;
+  
+  display: block;
+  clear: both;
+  margin-left:4%;
+  margin-right:4%;
+}
+
+a:hover, a:active {
+  background-color: rgba(255, 99, 71, 0.82);
+}
+
+h2{
+	background-color: tomato;
+	color: white;
+	width: 500px;
+	padding: 15px 25px;
+	font-size:30px;
+	
+	
+	text-decoration: none;
+	display: inline-block;
+	}
+	
+div {
+    text-align: center;
+}
+
+p{
+	background-color: inherit;
+	color: white;
+	display: inline-block;
+	font-size:30px;
+	margin-left:30%;
+	text-align:center;
+	width:40%;
+	padding: 15px 25px;
+	border: 1px solid tomato;
+
+}
+
+p2{
+	background-color: inherit;
+	color:white;
+	vertical-align: baseline;
+	display: inline-block;
+	
+	margin-left:23%;
+	
+	
+	width:45%;
+	
+
+}
+</style>
+
+
+
+<h1 style="text-align:center;font-size:50px">
+	<a href="main_page.html"> <img src="cart.png" alt="Shopping Cart" width="60" height="60">  Market Database UI</a>
+</h1>
+
+
+
+
+<div>
+<h2 style="width:1800px"> Conclusions </h2>
+	
+</div>
+<section>
+<?php
+
+
+$servername = "localhost";
+$username = "root";
+$password = "admin";
+$dbname = "vaseis2020";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+	$sqlPopPairs = "select  a.products_Barcode as product1, b.products_Barcode as product2, count(*) as frequency
+					from transaction_contains_products a, transaction_contains_products b
+					where a.products_Barcode <> b.products_Barcode and a.transaction_DateTime = b.transaction_DateTime
+					group by a.products_Barcode, b.products_Barcode
+					order by frequency desc
+					limit 10";
+	
+	$resultPopPairs = $conn->query($sqlPopPairs);
+	
+	echo "<table width=100%>". "<tr >". "<th>". "Most popular product pairs". "</th>". "</tr>". "</table>";
+	echo "<table width=100%>". "<tr >". "<th>". "Barcodes". "</th>". "</tr>". "</table>". "<table width=100%>";
+	while($rowPopPairs = $resultPopPairs->fetch_assoc()){
+		echo "<tr>". "<td>". $rowPopPairs['product1']. "</td>". "<td>". $rowPopPairs['product2']. "</td>". "</tr>";
+		
+	}
+	echo "</table>". "<br>";
+	
+	$sqlPer = "with temp(category, market_products) as 
+				(select Category_id,count(products_Barcode)
+				from category,transaction_contains_products,products
+				where transaction_contains_products.products_Barcode = products.Barcode and products.Brand_name = 'Market' and products.Category_Category_id = Category_id
+				group by Category_Category_id),
+				temp2(category, all_products) as
+				(select Category_Category_id,count(products_Barcode)
+				from transaction_contains_products,products
+				where transaction_contains_products.products_Barcode = products.Barcode
+				group by Category_Category_id)
+				select Name, round(market_products/all_products*100, 2) as percentage
+				from category,temp,temp2
+				where temp.category = temp2.category and temp.category = category.Category_id";
+	
+	$resultPer = $conn->query($sqlPer);
+	echo "<table width=100%>". "<tr>". "<th>". "Market Label Percentages". "</th>". "</tr>". "</table>". "<table width=100%>";
+	while($rowPer = $resultPer->fetch_assoc()){
+			echo "<tr>". "<td>". $rowPer['Name']. "</td>". "<td>". $rowPer['percentage']. " %". "</td>". "</tr>";
+	
+	}
+	echo "</table>". "<br>";
+	
+	$sqlHour = "select HOUR(Datetime) as hour, round(sum(Total_amount), 2) as total
+				from transaction 
+				group by hour
+				order by total desc
+				limit 5";
+	$resultHour = $conn->query($sqlHour);
+	echo "<table width=100%>". "<tr>". "<th>". "Top 5 selling hours". "</th>". "</tr>". "</table>". "<table width=100%>";
+	while($rowHour = $resultHour->fetch_assoc()){
+			echo "<tr>". "<td>". $rowHour['hour']. " :00". "</td>". "<td>". $rowHour['total']. " &euro;". "</td>". "</tr>";
+	}
+	echo "</table>";
+	
+	echo "</section>";
+	
+	
+	$sqlPopDep = "select Stores_Store_id, stores_offer_products.products_Barcode, Alley, Shelf, count(transaction_contains_products.products_Barcode) as frequency
+			      from stores_offer_products,transaction_contains_products
+				  where stores_offer_products.Products_Barcode = transaction_contains_products.products_Barcode
+				  group by stores_offer_products.products_Barcode, stores_offer_products.Stores_Store_id
+				  order by frequency desc
+				  limit 20";
+				  
+	$resultPopDep = $conn->query($sqlPopDep);
+	echo "<article>". "<table width=30%>". "<tr >". "<th>". "Most popular deposits". "</th>". "</tr>". "</table>";
+	echo "<table width=30% height=1472px>". "<tr >". "<th>". "Store id". "</th>". "<th>". "Alley". "</th>". "<th>". "Shelf". "</th>". "</tr>";
+	while($rowPopDep = $resultPopDep->fetch_assoc()){
+		echo "<tr>". "<td>". $rowPopDep['Stores_Store_id']. "</td>". "<td>". $rowPopDep['Alley']. "</td>". "<td>". $rowPopDep['Shelf']. "</td>". "</tr>";
+		
+	}
+	echo "</table>". "</article>";
+	
+	
+	
+?>
+<p2> 
+<br>
+<div id="columnchart_material" style="width: 1000px; height: 700px;"></div>
+</p2>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['bar']});
+      google.charts.setOnLoadCallback(drawChart);
+		
+      function drawChart() {
+		<?php
+			$sqlHours = "with age_25(hour, people) as 
+						(select hour(DateTime) as allHour, count(customer_Card)
+						from transaction,customer
+						where transaction.customer_Card = customer.Card and customer.Age < 25
+						group by allHour),
+						age25_45(hour, people) as
+						(select hour(DateTime) as allHour, count(customer_Card)
+						from transaction,customer
+						where transaction.customer_Card = customer.Card and customer.Age >= 25 and customer.Age <= 45
+						group by allHour),
+						age45_(hour, people) as
+						(select hour(DateTime) as allHour, count(customer_Card)
+						from transaction,customer
+						where transaction.customer_Card = customer.Card and customer.Age > 45
+						group by allHour)
+						select hour(DateTime) as allHour, age_25.people as people_25, age25_45.people as people25_45, age45_.people as people45_
+						from transaction,age_25, age25_45, age45_
+						where age_25.hour = hour(DateTime) and age25_45.hour = hour(DateTime) and age45_.hour = hour(DateTime)
+						group by allHour
+						order by allHour";
+		  
+		  
+			$resultHours= $conn->query($sqlHours);
+			
+		  ?>
+	  
+        var arr = [];
+		arr.push(['Hour', '< 25', '25 - 45', '> 45']);
+
+		var i = 0;
+		
+		<?php 
+			while($rowHours = $resultHours->fetch_assoc()){?>
+			
+			arr.push(['<?php echo $rowHours['allHour'];?>:00', <?php echo $rowHours['people_25'];?>, <?php echo $rowHours['people25_45'];?>, <?php echo $rowHours['people45_'];?>]);
+			<?php } ?>
+		var data = google.visualization.arrayToDataTable(arr);
+        var options = {
+          chart: { title: 'Hours Turnout per Age Group' }
+        };
+
+        var chart = new google.charts.Bar(document.getElementById('columnchart_material'));
+
+        chart.draw(data, google.charts.Bar.convertOptions(options));
+      }
+    </script>
+
+</body>
+</html>

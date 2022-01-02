@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vaseis2020</title>
+</head>
+<body>
+
+
+
+<style>
+table {
+  border-collapse: collapse;
+}
+
+td{
+  background-color: tomato;
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+}
+
+th{
+  background-color: rgba(255, 99, 71, 0.6);
+  border: 1px solid black;
+  margin:18px;
+  font-size:30px;
+  padding: 15px 25px;
+  color:white;
+  text-align:center;
+}
+
+
+p{
+	background-color: tomato;
+	color: white;
+	text-align:left;
+	padding: 15px 25px;
+	font-size:30px;
+	border:3px solid black;
+	margin:10px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+
+body{
+	background-color:CadetBlue;
+	height: 100%;
+	
+}
+
+
+
+a:link, a:visited {
+	background-color: tomato;
+	color: white;
+	padding: 15px 25px;
+	text-decoration: none;
+	display: inline-block;
+}
+
+a:hover, a:active {
+  background-color: rgba(255, 99, 71, 0.82);
+}
+
+h2{
+	background-color: tomato;
+	color: white;
+	width: 500px;
+	padding: 15px 25px;
+	font-size:30px;
+	
+	
+	text-decoration: none;
+	display: inline-block;
+	}
+	
+div {
+    text-align: center;
+}
+</style>
+
+
+
+<h1 style="text-align:center;font-size:50px">
+	<a href="main_page.html"> <img src="cart.png" alt="Shopping Cart" width="60" height="60">  Market Database UI</a>
+</h1>
+
+
+
+
+<div>
+<h2 style="width:1800px"> Customers Details </h2>
+
+</div>
+
+
+
+<table>
+<?php
+
+$servername = "localhost";
+$username = "root";
+$password = "admin";
+$dbname = "vaseis2020";
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+// Check connection
+if ($conn->connect_error) {
+  die("Connection failed: " . $conn->connect_error);
+}
+
+$sql = "SELECT *FROM customer ORDER BY Name";
+$result = $conn->query($sql);
+
+
+if ($result->num_rows > 0) {
+  // output data of each row
+  echo "<tr> <th>Card</th> <th>Phone</th> <th>Name</th> <th>Date of birth</th> <th>Age</th> <th>City</th> <th>Postal code</th> <th>Family members</th> <th>Pets</th> <th>Points</th></tr>";
+
+  while($row = $result->fetch_assoc()) {
+    echo "<tr>";
+	echo "<td>". $row['Card']. "</td>";
+	echo "<td>". $row['Phone']. "</td>";
+	echo "<td>". $row['Name']. "</td>";
+	echo "<td>". $row['Date_of_birth']. "</td>";
+	echo "<td>". $row['Age']. "</td>";
+	echo "<td>". $row['City']. "</td>";
+	echo "<td>". $row['Postal_code']. "</td>";
+	echo "<td>". $row['Family_members']. "</td>";
+	echo "<td>". $row['Pet']. "</td>";
+	echo "<td>". $row['Points']. "</td>";
+	echo "</tr>";
+  }
+} else {
+  echo "0 results";
+}
+
+$conn->close();
+?>
+</table>
+</body>
+</html>
